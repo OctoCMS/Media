@@ -6,13 +6,14 @@ use b8\Config;
 use b8\Form\Element\Button;
 use Octo\Admin\Form;
 use Octo\Block;
+use Octo\Store;
 
 class Image extends Block
 {
     public static function getInfo()
     {
         return [
-            'title' => 'Images',
+            'title' => 'Image',
             'icon' => 'picture-o',
             'editor' => ['\Octo\Media\Block\Image', 'getEditorForm'],
         ];
@@ -42,31 +43,11 @@ class Image extends Block
 
     public function renderNow()
     {
-        $this->view->width = 800;
-        $this->view->height = 'auto';
-        $this->view->format = 'jpeg';
+        $image = $this->getContent('image', null);
 
-        if (isset($this->templateParams['width'])) {
-            $this->view->width = $this->templateParams['width'];
-        }
-
-        if (isset($this->templateParams['height'])) {
-            $this->view->height = $this->templateParams['height'];
-        }
-
-        if (isset($this->templateParams['format'])) {
-            $this->view->format = $this->templateParams['format'];
-        }
-
-        if (isset($this->templateParams['hideTag'])) {
-            $this->view->hideTag = true;
-        }
-
-        $image = $this->getContent('image', '');
-
-        if (isset($image)) {
-            $this->view->image = $image;
-            return;
+        if (!empty($image)) {
+            $file = Store::get('File')->getById($image);
+            return new \Octo\Media\Image($file);
         }
     }
 }

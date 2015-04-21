@@ -13,7 +13,7 @@ class Attachment extends Block
     public static function getInfo()
     {
         return [
-            'title' => 'Files',
+            'title' => 'File',
             'icon' => 'picture-o',
             'editor' => ['\Octo\Media\Block\Attachment', 'getEditorForm'],
         ];

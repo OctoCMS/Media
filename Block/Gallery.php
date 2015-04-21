@@ -4,6 +4,7 @@ namespace Octo\Media\Block;
 
 use b8\Database;
 use b8\Form\Element\Button;
+use b8\Form\Element\Checkbox;
 use Octo\Admin\Form;
 use Octo\Admin\Template as AdminTemplate;
 use Octo\Block;
@@ -21,7 +22,7 @@ class Gallery extends Block
     public static function getInfo()
     {
         return [
-            'title' => 'Galleries',
+            'title' => 'Image Gallery',
             'icon' => 'image',
             'editor' => ['\Octo\Media\Block\Gallery', 'getEditorForm']
         ];
@@ -36,6 +37,24 @@ class Gallery extends Block
         $formSelect->setId('block_gallery_parent_' . $item['id']);
         $formSelect->setClass('octo-image-picker skip-autosave');
         $form->addField($formSelect);
+
+        $controls = Checkbox::create('controls', 'Show Controls', false);
+        $controls->setCheckedValue(1);
+
+        if (!empty($item['content']['controls'])) {
+            $controls->setValue(1);
+        }
+
+        $form->addField($controls);
+
+        $controls = Checkbox::create('captions', 'Show Captions', false);
+        $controls->setCheckedValue(1);
+
+        if (!empty($item['content']['captions'])) {
+            $controls->setValue(1);
+        }
+
+        $form->addField($controls);
 
         $saveButton = new Button();
         $saveButton->setValue('Save ' . $item['name']);
@@ -62,8 +81,8 @@ class Gallery extends Block
     public function renderNow()
     {
         $this->limit = 25;
-        $this->view->hasControls = true;
-        $this->view->hasCaptions = true;
+        $this->view->hasControls = $this->getContent('controls', false);
+        $this->view->hasCaptions = $this->getContent('captions', false);;
         $this->view->imageFormat = 'jpeg';
         $this->view->imageWidth = 1170;
 

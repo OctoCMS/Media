@@ -13,7 +13,7 @@ class TextImage extends Text
     public static function getInfo()
     {
         return [
-            'title' => 'Text &amp; Images',
+            'title' => 'Text & Image',
             'icon' => 'picture-o',
             'editor' => ['\Octo\Media\Block\TextImage', 'getEditorForm'],
         ];
