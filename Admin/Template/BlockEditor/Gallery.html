@@ -17,8 +17,8 @@
         item.append('<input type="hidden" name="images[]" value="'+id+'">');
 
         var btn = $('<button class="close" style="position:absolute;right:8px;">').text('×').on('click', function () {
-            galleryImagePicker.trigger('autosave');
             $(this).parent('li').remove();
+            galleryImagePicker.trigger('autosave');
         });
 
         item.append(btn);
