@@ -26,12 +26,12 @@ class MediaController extends Controller
         $media = $menu->addRoot('Media', '/media')->setIcon('picture-o');
         $media->addChild(new Menu\Item('Upload', '/media/add'));
 
-        $media->addChild(Menu\Item::create('Search Images', '/media/autocomplete/images', false));
+        $media->addChild(Menu\Item::create('Search Images', '/media/autocomplete/images', true));
         $media->addChild(Menu\Item::create('Manage Images', '/media/manage/images', false));
         $media->addChild(Menu\Item::create('Edit Images', '/media/delete/images', true));
         $media->addChild(Menu\Item::create('Delete Images', '/media/delete/images', true));
 
-        $media->addChild(Menu\Item::create('Search Files', '/media/autocomplete/files', false));
+        $media->addChild(Menu\Item::create('Search Files', '/media/autocomplete/files', true));
         $media->addChild(Menu\Item::create('Manage Files', '/media/manage/files', false));
         $media->addChild(Menu\Item::create('Edit Files', '/media/delete/files', true));
         $media->addChild(Menu\Item::create('Delete Files', '/media/delete/files', true));
