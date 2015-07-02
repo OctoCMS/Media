@@ -31,7 +31,7 @@ class MediaController extends Controller
      * @param int $width
      * @param int $height
      */
-    public function render($fileId, $width = null, $height = null, $type = 'jpeg')
+    public function render($fileId, $width = null, $height = 'auto', $type = 'jpeg')
     {
         $file = $this->fileStore->getById($fileId);
 
@@ -43,9 +43,13 @@ class MediaController extends Controller
         if ($width == null) {
             $width = $originalWidth;
         }
-        if ($height == null) {
-            $height = $originalHeight;
+
+        $focal = $file->getMeta('focal_point');
+        if (is_null($focal) || !is_array($focal)) {
+            $focal = [round($originalWidth/2), round($originalHeight/2)];
         }
+
+        $image->setFocalPoint($focal[0], $focal[1]);
 
         $output = (string)$image->render($width, $height, $type);
 

@@ -149,6 +149,13 @@ class MediaController extends Controller
         $this->view->file = $file;
 
         if ($this->request->getMethod() == 'POST') {
+
+            if ($this->request->isAjax()) {
+                $file->setMeta('focal_point', [$this->getParam('x', 0), $this->getParam('y', 0)]);
+                $this->fileStore->save($file);
+                die('OK');
+            }
+
             $values = array_merge($this->getParams(), array('id' => $fileId));
             $form = $this->fileForm($values, $scope, 'edit');
 
@@ -172,8 +179,17 @@ class MediaController extends Controller
         $this->view->form = $this->fileForm($file->getDataArray(), $scope)->render();
 
         $imageFiles = ['jpg', 'jpeg', 'gif', 'png'];
+
         if (in_array($file->getExtension(), $imageFiles)) {
             $this->view->image = $file->getUrl();
+
+            $focal = $file->getMeta('focal_point');
+
+            if (is_null($focal) || !is_array($focal)) {
+                $focal = [0, 0];
+            }
+
+            $this->view->focal = json_encode($focal);
         }
 
         Event::trigger($scope . 'MediaEditForm', $this);

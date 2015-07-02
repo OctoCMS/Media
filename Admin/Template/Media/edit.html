@@ -1,18 +1,19 @@
 
 <div class="row">
-{if image}
-<div class="col-lg-5">
-<div class="box box-info">
-	<div role="content" style="border-top: 1px solid #CDCDCD;">
-        <div class="box-body no-passing">
-            <img src="{@image}" class="img-responsive" />
-        </div>
-    </div>
-</div>
-</div>
-{/if}
+    {if image}
+    <div class="col-sm-9">
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title">Natural Dimensions</h3>
+            </div>
 
-    <div class="col-lg-7">
+            <div role="content">
+                <div class="box-body no-passing">
+                    <canvas id="primary-image" style="width: 100%"></canvas>
+                </div>
+            </div>
+        </div>
+
         <div class="box box-primary">
 
             <div role="content">
@@ -27,9 +28,141 @@
 
         </div>
         <br>
-        {if image}
-        <a href="/media/render/{@file.id}/2000/auto" class="btn btn-default btn-sm">View Large</a>&nbsp;&nbsp;
-        {/if}
-        <a href="/{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete</a>
+
+        <a href="/media/render/{@file.id}" class="btn btn-default btn-sm">Download Full Size</a>&nbsp;&nbsp;
+        <a href="/{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete Image</a>
     </div>
+
+    <div class="col-sm-3">
+        <div class="box box-default">
+            <div class="box-header">
+                <h3 class="box-title">4x3</h3>
+            </div>
+            <div role="content">
+                <div class="box-body no-passing">
+                    <img data-src="/media/render/{@file.id}/400/300" src="/media/render/{@file.id}/400/300" class="img-preview img-responsive" />
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-default">
+            <div class="box-header">
+                <h3 class="box-title">16x9</h3>
+            </div>
+            <div role="content">
+                <div class="box-body no-passing">
+                    <img data-src="/media/render/{@file.id}/800/450" src="/media/render/{@file.id}/800/450" class="img-preview img-responsive" />
+                </div>
+            </div>
+        </div>
+
+        <div class="box box-default">
+            <div class="box-header">
+                <h3 class="box-title">9x16</h3>
+            </div>
+            <div role="content">
+                <div class="box-body no-passing">
+                    <img data-src="/media/render/{@file.id}/450/800" src="/media/render/{@file.id}/450/800" class="img-preview img-responsive" />
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    {ifnot image}
+    <div class="col-sm-9">
+
+        <div class="box box-primary">
+
+            <div role="content">
+
+                <div class="box-body">
+
+                    {@form}
+
+                </div>
+
+            </div>
+
+        </div>
+        <br>
+
+        <a href="/{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete File</a>
+    </div>
+
+    {/ifnot}
 </div>
+
+{if image}
+<script>
+    window.focalPoint = {@focal};
+    window.image = new Image();
+    window.imageScale = 100;
+    window.imageCvs = null;
+    window.imageCtx = null;
+
+    window.scaledWidth = 0;
+    window.scaledHeight = 0;
+
+    $(document).ready(function () {
+        setTimeout(imageInit, 500);
+    });
+
+    function imageInit() {
+        var img = window.image;
+
+        img.onload = function() {
+            window.imageCvs = document.getElementById('primary-image');
+            window.scaledWidth = $(window.imageCvs).width();
+            window.imageScale = (100/img.width) * window.scaledWidth;
+            window.scaledHeight = Math.ceil((img.height/100) * window.imageScale);
+            var scaleUp = (100/window.scaledWidth) * img.width;
+
+            window.imageCvs.width = window.scaledWidth;
+            window.imageCvs.height = window.scaledHeight;
+            window.imageCtx = window.imageCvs.getContext('2d');
+
+            $(window.imageCvs).on('click', function (e) {
+                var focalX = parseInt((e.offsetX / 100) * scaleUp);
+                var focalY = parseInt((e.offsetY / 100) * scaleUp);
+
+                window.focalPoint = [focalX, focalY];
+
+                $.post('/{@adminUri}/media/edit/images/{@file.id}', {'x': focalX, 'y': focalY}, function () {
+                    $('.img-preview').each(function () {
+                        $(this).attr('src', $(this).data('src') + '?t=' + new Date().getTime());
+                    });
+                });
+
+
+                drawFocalPoint();
+            })
+
+            drawFocalPoint();
+        };
+
+        img.src = '/media/render/{@file.id}';
+    }
+
+    function drawImage() {
+        window.imageCtx.drawImage(window.image, 0, 0, window.image.width, window.image.height, 0, 0, window.scaledWidth, window.scaledHeight);
+    }
+
+    function drawFocalPoint() {
+        drawImage();
+
+        var centerX = (window.focalPoint[0]/100) * window.imageScale;
+        var centerY = (window.focalPoint[1]/100) * window.imageScale;
+        var radius = 5;
+
+
+        window.imageCtx.beginPath();
+        window.imageCtx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        window.imageCtx.fillStyle = 'green';
+        window.imageCtx.fill();
+        window.imageCtx.lineWidth = 2;
+        window.imageCtx.strokeStyle = 'lightgreen';
+        window.imageCtx.stroke();
+    }
+</script>
+{/if}
