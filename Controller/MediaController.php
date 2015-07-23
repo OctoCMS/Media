@@ -62,6 +62,29 @@ class MediaController extends Controller
         die($output);
     }
 
+    public function resize($width, $height = 'auto', $type = 'jpeg')
+    {
+        Image::$sourcePath = '';
+
+        try {
+            $image = new Image($this->getParam('url'));
+            $output = (string)$image->render($width, $height, $type);
+        } catch (\Exception $ex) {
+            $image = new \Imagick();
+            $image->newImage($width, $height, new \ImagickPixel('grey'));
+            $image->setImageFormat($type);
+            $output = (string)$image->getImage();
+        }
+
+        header('Content-Type: image/'.$type);
+        header('Content-Length: ' . strlen($output));
+        header('Cache-Control: public');
+        header('Pragma: cache');
+        header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (86400*100)));
+
+        die($output);
+    }
+
     /**
      * Return an AJAX list of all images
      *
