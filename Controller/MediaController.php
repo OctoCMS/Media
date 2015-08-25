@@ -31,11 +31,17 @@ class MediaController extends Controller
      * @param int $width
      * @param int $height
      */
-    public function render($fileId, $width = null, $height = 'auto', $type = 'jpeg')
+    public function render($fileId, $width = null, $height = 'auto', $type = 'jpeg', $debug = false)
     {
         $file = $this->fileStore->getById($fileId);
 
+        if ($debug) {
+            Image::$cacheEnabled = false;
+            Image::$forceGd = true;
+        }
+
         Image::$sourcePath = APP_PATH . '/public/uploads/';
+
         $image = new Image($file->getId() . '.' . $file->getExtension());
 
         list($originalWidth, $originalHeight) = getimagesize($file->getPath());
