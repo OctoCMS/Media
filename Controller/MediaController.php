@@ -36,6 +36,10 @@ class MediaController extends Controller
         $file = $this->fileStore->getById($fileId);
 
         if ($debug) {
+            ini_set('error_reporting', E_ALL);
+            ini_set('log_errors', 'on');
+            ini_set('display_errors', 'off');
+
             Image::$cacheEnabled = false;
             Image::$forceGd = true;
         }
