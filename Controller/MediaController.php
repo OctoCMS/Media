@@ -1,6 +1,7 @@
 <?php
 namespace Octo\Media\Controller;
 
+use b8\Cache;
 use b8\Image;
 use b8\Form;
 use Octo\Controller;
@@ -36,10 +37,6 @@ class MediaController extends Controller
         $file = $this->fileStore->getById($fileId);
 
         if ($debug) {
-            ini_set('error_reporting', E_ALL);
-            ini_set('log_errors', 'on');
-            ini_set('display_errors', 'off');
-
             Image::$cacheEnabled = false;
             Image::$forceGd = true;
         }
@@ -48,18 +45,11 @@ class MediaController extends Controller
 
         $image = new Image($file->getId() . '.' . $file->getExtension());
 
-        list($originalWidth, $originalHeight) = getimagesize($file->getPath());
-
-        if ($width == null) {
-            $width = $originalWidth;
-        }
-
         $focal = $file->getMeta('focal_point');
-        if (is_null($focal) || !is_array($focal)) {
-            $focal = [round($originalWidth/2), round($originalHeight/2)];
-        }
 
-        $image->setFocalPoint($focal[0], $focal[1]);
+        if (!is_null($focal) && is_array($focal)) {
+            $image->setFocalPoint($focal[0], $focal[1]);
+        }
 
         $output = (string)$image->render($width, $height, $type);
 
@@ -76,22 +66,54 @@ class MediaController extends Controller
     {
         Image::$sourcePath = '';
 
-        try {
-            $image = new Image($this->getParam('url'));
-            $output = (string)$image->render($width, $height, $type);
-        } catch (\Exception $ex) {
-            $image = new \Imagick();
-            $image->newImage($width, $height, new \ImagickPixel('grey'));
-            $image->setImageFormat($type);
-            $output = (string)$image->getImage();
+        $images = $this->getParam('url', []);
+
+        if (is_string($images)) {
+            $images = [$images];
         }
+
+        $imageRequestId = 'image_' . md5(http_build_query($images) . '_'.$width.'_'.$height.'_'.$type);
+
+        $cache = Cache::getCache();
+
+        if ($cache->contains($imageRequestId)) {
+            $output = $cache->get($imageRequestId);
+
+            header('Content-Type: image/'.$type);
+            header('Content-Length: ' . strlen($output));
+            header('Cache-Control: public');
+            header('Pragma: cache');
+            header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (86400*100)));
+            die($output);
+        }
+
+        foreach ($images as $url) {
+            try {
+                $image = new Image($url);
+                break;
+            } catch (\Exception $ex) {
+            }
+        }
+
+        if (!empty($image)) {
+            try {
+                $output = (string)$image->render($width, $height, $type);
+            } catch (\Exception $ex) {
+                $output = null;
+            }
+        }
+
+        if (empty($output)) {
+            $output = Image\GdImage::blankImage(1, 1);
+        }
+
+        $cache->set($imageRequestId, $output);
 
         header('Content-Type: image/'.$type);
         header('Content-Length: ' . strlen($output));
         header('Cache-Control: public');
         header('Pragma: cache');
         header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (86400*100)));
-
         die($output);
     }
 
