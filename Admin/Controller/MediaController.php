@@ -41,10 +41,6 @@ class MediaController extends Controller
      * @var \Octo\File\Store\FileStore
      */
     protected $fileStore;
-    /**
-     * @var \Octo\Categories\Store\CategoryStore
-     */
-    protected $categoryStore;
 
     /**
      * Setup initial menu
@@ -58,7 +54,6 @@ class MediaController extends Controller
         $this->addBreadcrumb('Media', '/media/add');
 
         $this->fileStore = Store::get('File');
-        $this->categoryStore = Store::get('Category');
     }
 
     /**
@@ -102,11 +97,6 @@ class MediaController extends Controller
                 default:
                     $file->setScope('files');
                     break;
-            }
-
-            $categories = $this->categoryStore->getByScope($file->getScope());
-            if (isset($categories[0])) {
-                $file->setCategoryId($categories[0]->getId());
             }
 
             try {
