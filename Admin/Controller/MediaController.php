@@ -104,24 +104,28 @@ class MediaController extends Controller
 
                 if ($foundFile = $this->fileStore->getById($file->getId())) {
                     $data = array_merge($foundFile->getDataArray(), array('url' => $foundFile->getUrl()));
-                    print json_encode($data);
-                    exit;
+                    die(json_encode($data));
                 }
 
-                $uploadDirectory = APP_PATH . 'public/uploads/';
-                $upload->copyTo($uploadDirectory . $file->getId() . '.' . $file->getExtension());
                 $file = $this->fileStore->saveByInsert($file);
+
+                $fileInfo = [
+                    'id' => $file->getId(),
+                    'data' => $upload->getFileData(),
+                    'extension' => $file->getExtension(),
+                ];
+
+                if (!Event::trigger('PutFile', $fileInfo)) {
+                    $this->fileStore->delete($file);
+                    die(json_encode(['error' => true, 'message' => 'Upload failed']));
+                }
 
                 Event::trigger($scope . 'FileSaved', $file);
 
-                $url = '/uploads/' . $file->getId() . '.'  . $file->getExtension();
-                $data = array_merge($file->getDataArray(), array('url' => $url));
-                print json_encode($data);
-                exit;
+                $data = $file->getDataArray();
+                die(json_encode($data));
             } catch (\Exception $ex) {
-                print $ex->getMessage();
-                print json_encode(array('error' => true));
-                exit;
+                die(json_encode(['error' => true, 'message' => $ex->getMessage()]));
             }
         }
         $this->view->scope = $scope;

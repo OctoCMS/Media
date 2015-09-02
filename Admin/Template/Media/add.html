@@ -82,6 +82,7 @@ $(document).ready(function()
             f = JSON.parse(response.response);
 
             if(f.extension == 'jpg' || f.extension == 'jpeg' || f.extension == 'gif' || f.extension == 'png') {
+                f.url = '/media/render/' + f.id + '/200/150/jpeg';
                 insert = '<div style="display: block; width: 200px;"><img style="max-width:100%; max-height:100%;" src="' + f.url + '"></div>';
             } else {
                 insert = f.title;

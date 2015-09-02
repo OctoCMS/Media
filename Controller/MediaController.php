@@ -5,6 +5,7 @@ use b8\Cache;
 use b8\Image;
 use b8\Form;
 use Octo\Controller;
+use Octo\Event;
 use Octo\Store;
 use Octo\File\Store\FileStore;
 use Octo\File\Store\FileDownloadStore;
@@ -41,17 +42,24 @@ class MediaController extends Controller
             Image::$forceGd = true;
         }
 
-        Image::$sourcePath = APP_PATH . '/public/uploads/';
+        $imageInfo = ['id' => $file->getId(), 'extension' => $file->getExtension(), 'data' => null];
 
-        $image = new Image($file->getId() . '.' . $file->getExtension());
+        Event::trigger('GetFile', $imageInfo);
 
-        $focal = $file->getMeta('focal_point');
+        if (!empty($imageInfo['data'])) {
+            $image = new Image($imageInfo['data'], $file->getId());
+            $focal = $file->getMeta('focal_point');
 
-        if (!is_null($focal) && is_array($focal)) {
-            $image->setFocalPoint($focal[0], $focal[1]);
+            if (!is_null($focal) && is_array($focal)) {
+                $image->setFocalPoint($focal[0], $focal[1]);
+            }
+
+            $output = (string)$image->render($width, $height, $type);
         }
 
-        $output = (string)$image->render($width, $height, $type);
+        if (empty($output)) {
+            $output = Image\GdImage::blankImage(1, 1);
+        }
 
         header('Content-Type: image/'.$type);
         header('Content-Length: ' . strlen($output));
