@@ -97,7 +97,8 @@ class MediaController extends Controller
 
         foreach ($images as $url) {
             try {
-                $image = new Image($url);
+                $data = @file_get_contents($url);
+                $image = new Image($data);
                 break;
             } catch (\Exception $ex) {
             }
