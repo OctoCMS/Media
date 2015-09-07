@@ -3,7 +3,7 @@
     {loop files}
 
     <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6">
-        <a href="/{@adminUri}/media/edit/{@scope}/{@item.id}" style="display:inline-block;margin-bottom: 30px;">
+        <a href="{@adminUri}/media/edit/{@scope}/{@item.id}" style="display:inline-block;margin-bottom: 30px;">
             <img src="/media/render/{@item.id}/400/300" class="img-responsive">
         </a>
     </div>
@@ -15,7 +15,7 @@
             </div>
 
             <div class="box-body no-padding">
-                <a href="/{@adminUri}/media/edit/{@scope}/{@item.id}"><img src="/media/render/{@item.id}/200/200" class="img-responsive"></a>
+                <a href="{@adminUri}/media/edit/{@scope}/{@item.id}"><img src="/media/render/{@item.id}/200/200" class="img-responsive"></a>
             </div>
         </div>
     </div -->
@@ -56,15 +56,15 @@
                     {if reorder}<td><i class="fa fa-fw fa-arrows handler"></i></td>{/if}
                     <td>
                         <div class="btn-group">
-                            <a class="btn btn-default btn-sm" href="/{@adminUri}/media/edit/{@scope}/{@item.id}{@queryStringAppend}">Edit</a>
+                            <a class="btn btn-default btn-sm" href="{@adminUri}/media/edit/{@scope}/{@item.id}{@queryStringAppend}">Edit</a>
                             <a class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);"><span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="/{@adminUri}/media/edit/{@scope}/{@item.id}{@queryStringAppend}">Edit</a>
+                                    <a href="{@adminUri}/media/edit/{@scope}/{@item.id}{@queryStringAppend}">Edit</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="/{@adminUri}/media/delete/{@scope}/{@item.id}{@queryStringAppend}" class="btn-delete">Delete</a>
+                                    <a href="{@adminUri}/media/delete/{@scope}/{@item.id}{@queryStringAppend}" class="btn-delete">Delete</a>
                                 </li>
                             </ul>
                         </div>

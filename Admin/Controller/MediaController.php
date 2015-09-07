@@ -160,8 +160,7 @@ class MediaController extends Controller
                     $this->successMessage($file->getTitle() . ' was edited successfully.', true);
 
                     Event::trigger($scope . 'MediaEditPostSave', $this);
-
-                    header('Location: /' . $this->config->get('site.admin_uri') . '/media/manage/' . $scope);
+                    $this->redirect('/media/manage/' . $scope);
                 } catch (\Exception $e) {
                     $this->errorMessage('There was an error editing the file. Please try again.');
                 }
@@ -194,7 +193,7 @@ class MediaController extends Controller
         $form = new FormElement();
         $form->setMethod('POST');
 
-        $form->setAction('/' . $this->config->get('site.admin_uri') . '/media/edit/' . $scope . '/' . $values['id']);
+        $form->setAction($this->config->get('site.full_admin_url') . '/media/edit/' . $scope . '/' . $values['id']);
 
         $form->setClass('smart-form');
 
@@ -274,8 +273,7 @@ class MediaController extends Controller
         $this->successMessage($file->getTitle() . ' was deleted successfully.', true);
 
         Event::trigger($scope . 'DeleteFile', $this);
-
-        header('Location: /' . $this->config->get('site.admin_uri') . '/media/manage/' . $scope);
+        $this->redirect('/media/manage/'.$scope);
     }
 
     /**

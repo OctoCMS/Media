@@ -30,7 +30,7 @@
         <br>
 
         <a href="/media/render/{@file.id}" class="btn btn-default btn-sm">Download Full Size</a>&nbsp;&nbsp;
-        <a href="/{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete Image</a>
+        <a href="{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete Image</a>
     </div>
 
     <div class="col-sm-3">
@@ -87,7 +87,7 @@
         </div>
         <br>
 
-        <a href="/{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete File</a>
+        <a href="{@adminUri}/media/delete/{@scope}/{@file.id}" class="btn btn-danger btn-sm btn-delete">Delete File</a>
     </div>
 
     {/ifnot}
@@ -128,7 +128,7 @@
 
                 window.focalPoint = [focalX, focalY];
 
-                $.post('/{@adminUri}/media/edit/images/{@file.id}', {'x': focalX, 'y': focalY}, function () {
+                $.post('{@adminUri}/media/edit/images/{@file.id}', {'x': focalX, 'y': focalY}, function () {
                     $('.img-preview').each(function () {
                         $(this).attr('src', $(this).data('src') + '?t=' + new Date().getTime());
                     });
