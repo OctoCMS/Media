@@ -249,7 +249,8 @@ class MediaController extends Controller
      */
     public function autocomplete($scope)
     {
-        $files = $this->fileStore->search($scope, $this->getParam('q', ''));
+        $query = $this->getParam('q', '')['term'];
+        $files = $this->fileStore->search($scope, $query);
 
         $rtn = ['results' => [], 'more' => false];
 
