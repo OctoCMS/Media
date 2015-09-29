@@ -33,12 +33,13 @@ class MediaController extends Controller
      * @param int $width
      * @param int $height
      */
-    public function render($fileId, $width = null, $height = 'auto', $type = 'jpeg', $debug = false)
+    public function render($fileId, $width = 'auto', $height = 'auto', $type = 'jpeg', $debug = false)
     {
         $file = $this->fileStore->getById($fileId);
 
+        Image::$cacheEnabled = false;
+
         if ($debug) {
-            Image::$cacheEnabled = false;
             Image::$forceGd = true;
         }
 
