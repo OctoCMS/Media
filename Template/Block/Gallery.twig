@@ -1,0 +1,35 @@
+<div id="{{ id }}" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    {% if hasControls %}
+        <ol class="carousel-indicators">
+            {% for item in images %}
+                <li data-target="#{{ id }}" data-slide-to="{{ loop.index0 }}"></li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+        {% for item in images %}
+            <div class="{{ item.id == firstImageId ? 'item active' : 'item' }}">
+                <img src="/media/render/{{ item.id }}/{{ imageWidth }}/auto/png" alt="{{ item.title }}">
+
+                {% if hasCaptions %}
+                    <div class="carousel-caption">
+                        {{ item.title }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    {% if hasControls %}
+    <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+    {% endif %}
+</div>
