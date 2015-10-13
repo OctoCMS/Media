@@ -24,9 +24,17 @@ class Image extends Block
         $form = new Form('block_image_' . $item['id']);
         $form->setId('block_' . $item['id']);
 
-        $image = \b8\Form\Element\Text::create('image', 'Image', false);
+        $image = \b8\Form\Element\Select::create('image', 'Image', false);
         $image->setId('block_image_image_' . $item['id']);
         $image->setClass('octo-image-picker');
+
+        if (isset($item['content']['image'])) {
+            $file = Store::get('File')->getById($item['content']['image']);
+
+            if ($file) {
+                $image->setOptions([$file->getId() => $file->getTitle()]);
+            }
+        }
 
         $saveButton = new Button();
         $saveButton->setValue('Save ' . $item['name']);
