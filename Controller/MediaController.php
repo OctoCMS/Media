@@ -37,11 +37,8 @@ class MediaController extends Controller
     {
         $file = $this->fileStore->getById($fileId);
 
-        Image::$cacheEnabled = false;
-
-        if ($debug) {
-            Image::$forceGd = true;
-        }
+        Image::$cacheEnabled = OCTO_CACHE_ENABLED;
+        Image::$baseCachePath = OCTO_CACHE_PATH;
 
         $imageInfo = ['id' => $file->getId(), 'extension' => $file->getExtension(), 'data' => null];
 

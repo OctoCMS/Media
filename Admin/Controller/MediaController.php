@@ -26,7 +26,9 @@ class MediaController extends Controller
         $media = $menu->addRoot('Media', '/media')->setIcon('picture-o');
         $media->addChild(new Menu\Item('Upload', '/media/add'));
 
+        $media->addChild(Menu\Item::create('Load Metadata', '/media/metadata', true));
         $media->addChild(Menu\Item::create('Search Images', '/media/autocomplete/images', true));
+
         $media->addChild(Menu\Item::create('Manage Images', '/media/manage/images', false));
         $media->addChild(Menu\Item::create('Edit Images', '/media/edit/images', true));
         $media->addChild(Menu\Item::create('Delete Images', '/media/delete/images', true));
@@ -113,7 +115,10 @@ class MediaController extends Controller
                     'id' => $file->getId(),
                     'data' => $upload->getFileData(),
                     'extension' => $file->getExtension(),
+                    'file' => $file,
                 ];
+
+                Event::trigger('BeforePutFile', $fileInfo);
 
                 if (!Event::trigger('PutFile', $fileInfo)) {
                     $this->fileStore->delete($file);
