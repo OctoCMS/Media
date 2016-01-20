@@ -19,6 +19,8 @@ class Gallery extends Block
      */
     protected $fileStore;
 
+    protected $imageData = [];
+
     public static function getInfo()
     {
         return [
@@ -80,6 +82,28 @@ class Gallery extends Block
 
     public function renderNow()
     {
+        return $this;
+    }
+
+    public function getImages()
+    {
+        $rtn = [];
+        $galleryImages = $this->getContent('images', []);
+
+        if (is_array($galleryImages)) {
+            foreach ($galleryImages as $imageId) {
+                $rtn[$imageId] = [
+                    'image' => $this->fileStore->getById($imageId),
+                    'link' => $this->getContent('link_' . $imageId),
+                ];
+            }
+        }
+
+        return $rtn;
+    }
+
+    public function __toString()
+    {
         $this->limit = 25;
         $this->view->hasControls = $this->getContent('controls', false);
         $this->view->hasCaptions = $this->getContent('captions', false);;
@@ -135,5 +159,7 @@ class Gallery extends Block
                 $this->view->firstImageId = $images[0]->getId();
             }
         }
+
+        return $this->view->render();
     }
 }
