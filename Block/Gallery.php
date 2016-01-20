@@ -110,6 +110,7 @@ class Gallery extends Block
 
         if (is_array($galleryImages)) {
             $images = [];
+            $links = [];
             $rendered = 0;
 
             foreach ($galleryImages as $imageId) {
@@ -121,11 +122,13 @@ class Gallery extends Block
 
                 if (!is_null($image)) {
                     $images[] = $image;
+                    $links[$imageId] = $this->getContent('link_' . $imageId);
                 }
             }
 
             $this->view->id = uniqid('gallery_');
             $this->view->images = $images;
+            $this->view->links = $links;
             $this->view->imageCount = count($images);
 
             if (count($images)) {
