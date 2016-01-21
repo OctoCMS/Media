@@ -130,7 +130,7 @@
 
                 $.post('{@adminUri}/media/edit/images/{@file.id}', {'x': focalX, 'y': focalY}, function () {
                     $('.img-preview').each(function () {
-                        $(this).attr('src', $(this).data('src') + '?t=' + new Date().getTime());
+                        $(this).attr('src', $(this).data('src') + '?nocache=' + new Date().getTime());
                     });
                 });
 

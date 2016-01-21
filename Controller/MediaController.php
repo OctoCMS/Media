@@ -33,12 +33,16 @@ class MediaController extends Controller
      * @param int $width
      * @param int $height
      */
-    public function render($fileId, $width = 'auto', $height = 'auto', $type = 'jpeg', $debug = false)
+    public function render($fileId, $width = 'auto', $height = 'auto', $type = 'jpeg')
     {
         $file = $this->fileStore->getById($fileId);
 
         Image::$cacheEnabled = OCTO_CACHE_ENABLED;
         Image::$baseCachePath = OCTO_CACHE_PATH;
+
+        if ($this->getParam('nocache', 0)) {
+            Image::$cacheEnabled = false;
+        }
 
         $imageInfo = ['id' => $file->getId(), 'extension' => $file->getExtension(), 'data' => null];
 

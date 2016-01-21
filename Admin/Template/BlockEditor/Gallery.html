@@ -10,16 +10,34 @@
 
         console.log(blockContent);
 
+<<<<<<< Updated upstream
         var galleryImagePicker = $('#block_gallery_parent_{@blockId}');
         var current = '';
         var imageList = $('<ul class="gallery-list"></ul>');
+=======
+    var appendImage = function(id, data, prepend) {
+        var item = $('<li style="display:block;position:relative;border:1px solid #ccc;padding:8px;margin-bottom:8px;"></li>').text(data).data('id', id);
+        item.addClass(id);
+        item.append('<input type="hidden" name="images[]" value="'+id+'">');
+>>>>>>> Stashed changes
 
         var appendImage = function(id, data) {
             var item = $('<li class="gallery-item"></li>').text(data).data('id', id);
             item.addClass(id);
             item.append('<input type="hidden" name="images[]" value="'+id+'">');
 
+<<<<<<< Updated upstream
             var thisLink = '';
+=======
+        item.append(btn);
+
+        if (prepend) {
+            imageList.prepend(item);
+        } else {
+            imageList.append(item);
+        }
+    };
+>>>>>>> Stashed changes
 
             if (blockContent['link_' + id]) {
                 thisLink = blockContent['link_' + id];
@@ -32,6 +50,7 @@
                 galleryImagePicker.trigger('autosave');
             });
 
+<<<<<<< Updated upstream
             item.append(linkInput);
 
             var image = $('<img src="/media/render/' + id + '/60/40/jpeg">');
@@ -39,6 +58,11 @@
 
             var btn = $('<button class="close" style="position:absolute;top: 5px;right:8px;">').text('×').on('click', function () {
                 $(this).parent('li').remove();
+=======
+            imageList.insertAfter(galleryImagePicker);
+            galleryImagePicker.on('change', function () {
+                appendImage($(this).val(), $(this).select2('data')[0].text, true);
+>>>>>>> Stashed changes
                 galleryImagePicker.trigger('autosave');
             });
 
