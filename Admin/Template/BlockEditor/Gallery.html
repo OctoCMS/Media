@@ -8,36 +8,21 @@
             blockContent = {};
         }
 
-        console.log(blockContent);
-
         var galleryImagePicker = $('#block_gallery_parent_{@blockId}');
         var current = '';
         var imageList = $('<ul class="gallery-list"></ul>');
-    var appendImage = function(id, data, prepend) {
-        var item = $('<li style="display:block;position:relative;border:1px solid #ccc;padding:8px;margin-bottom:8px;"></li>').text(data).data('id', id);
-        item.addClass(id);
-        item.append('<input type="hidden" name="images[]" value="'+id+'">');
-
-        var appendImage = function(id, data) {
+        var appendImage = function(id, data, prepend) {
             var item = $('<li class="gallery-item"></li>').text(data).data('id', id);
+            //var item = $('<li style="display:block;position:relative;border:1px solid #ccc;padding:8px;margin-bottom:8px;"></li>').text(data).data('id', id);
+
             item.addClass(id);
             item.append('<input type="hidden" name="images[]" value="'+id+'">');
 
             var thisLink = '';
-        item.append(btn);
-
-        if (prepend) {
-            imageList.prepend(item);
-        } else {
-            imageList.append(item);
-        }
-    };
 
             if (blockContent['link_' + id]) {
                 thisLink = blockContent['link_' + id];
             }
-
-
 
             var linkInput = $('<input class="form-control" style="margin-top: 5px;" type="text" name="link_'+id+'" value="'+thisLink+'" placeholder="Link (optional)">');
             linkInput.on('change', function () {
@@ -51,17 +36,23 @@
 
             var btn = $('<button class="close" style="position:absolute;top: 5px;right:8px;">').text('×').on('click', function () {
                 $(this).parent('li').remove();
-
-            imageList.insertAfter(galleryImagePicker);
-
-            galleryImagePicker.on('change', function () {
-                appendImage($(this).val(), $(this).select2('data')[0].text, true);
                 galleryImagePicker.trigger('autosave');
             });
 
             item.append(btn);
-            imageList.append(item);
-        }
+
+            if (prepend) {
+                imageList.prepend(item);
+            } else {
+                imageList.append(item);
+            }
+        };
+
+
+
+
+
+
 
         $('.modal-footer button').attr('disabled', true);
 
