@@ -7,6 +7,7 @@ use Octo\Admin\Form;
 use b8\Form\Element\Button;
 use b8\Form\Element\TextArea;
 use b8\Form\FieldSet;
+use Octo\Store;
 
 class TextImage extends Text
 {
@@ -30,9 +31,17 @@ class TextImage extends Text
         $content->setId('block_textimage_content_' . $item['id']);
         $content->setClass('ckeditor advanced');
 
-        $image = \b8\Form\Element\Text::create('image', 'Image', false);
-        $image->setId('block_textimage_image_' . $item['id']);
+        $image = \b8\Form\Element\Select::create('image', 'Image', false);
+        $image->setId('block_image_image_' . $item['id']);
         $image->setClass('octo-image-picker');
+
+        if (isset($item['content']['image'])) {
+            $file = Store::get('File')->getById($item['content']['image']);
+
+            if ($file) {
+                $image->setOptions([$file->getId() => $file->getTitle()]);
+            }
+        }
 
         $link = \b8\Form\Element\Text::create('link', 'Link', false);
         $link->setId('block_textimage_link_'.$item['id']);
@@ -53,6 +62,11 @@ class TextImage extends Text
     }
 
     public function renderNow()
+    {
+        return $this;
+    }
+
+    public function __toString()
     {
         $this->view->width = 512;
         $this->view->height = 'auto';
@@ -79,6 +93,23 @@ class TextImage extends Text
             // Replace file blocks
             $content = preg_replace_callback('/\<img id\=\"([a-zA-Z0-9]{32})".*>/', [$this, 'replaceFile'], $content);
             $this->view->content = $content;
+        }
+
+        return $this->view->render();
+    }
+
+    public function getText()
+    {
+        return $this->getContent('content', '');
+    }
+
+    public function getImage()
+    {
+        $image = $this->getContent('image', null);
+
+        if (!empty($image)) {
+            $file = Store::get('File')->getById($image);
+            return new \Octo\Media\Image($file);
         }
     }
 }
