@@ -260,7 +260,11 @@ class MediaController extends Controller
         $rtn = ['results' => [], 'more' => false];
 
         foreach ($files as $file) {
-            $rtn['results'][] = ['id' => $file->getId(), 'text' => $file->getTitle()];
+            $rtn['results'][] = [
+                'id' => $file->getId(),
+                'text' => $file->getTitle(),
+                'filename' => $file->getFilename(),
+            ];
         }
 
         die(json_encode($rtn));
