@@ -8,13 +8,13 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row packery-blocks">
     {loop files}
 
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 image-thumb" data-title="{@item.title}">
+    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-6 image-thumb block" data-title="{@item.title}">
         <div class="box {if item.is_new}box-warning{/if}{ifnot item.is_new}box-default{/ifnot}">
             <a href="{@adminUri}/media/edit/{@scope}/{@item.id}">
-                <img src="/media/render/{@item.id}/800/600" class="img-responsive" style="width: 100%; max-height: 400px">
+                <img src="/media/render/{@item.id}/800/auto" class="img-responsive" style="width: 100%; max-height: 400px">
             </a>
 
             <div class="box-footer {if item.is_new}bg-yellow-gradient{/if}">
@@ -23,18 +23,6 @@
         </div>
 
     </div>
-
-    <!-- div class="col-lg-2">
-        <div class="box box-primary">
-            <div class="box-header">
-                <h3 class="box-title" style="min-height: 65px; max-height: 65px;">{@item.title}</h3>
-            </div>
-
-            <div class="box-body no-padding">
-                <a href="{@adminUri}/media/edit/{@scope}/{@item.id}"><img src="/media/render/{@item.id}/200/200" class="img-responsive"></a>
-            </div>
-        </div>
-    </div -->
 
     {/loop}
 </div>
@@ -52,14 +40,14 @@
             var keyword = $(this).val();
 
             for (var i in thumbs) {
-                console.log(keyword + ': ' + thumbs[i].title + ' --- ' + (thumbs[i].title.indexOf(keyword) !== false ? 'PRESENT' : 'MISSING'));
-
                 if (thumbs[i].title.indexOf(keyword) !== -1) {
                     thumbs[i].el.show();
                 } else {
                     thumbs[i].el.hide();
                 }
             }
+
+            $('.packery-blocks').packery();
         });
     });
 
