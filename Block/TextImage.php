@@ -88,11 +88,7 @@ class TextImage extends Text
         }
 
         if (array_key_exists('content', $this->content)) {
-            $content = $this->content['content'];
-
-            // Replace file blocks
-            $content = preg_replace_callback('/\<img id\=\"([a-zA-Z0-9]{32})".*>/', [$this, 'replaceFile'], $content);
-            $this->view->content = $content;
+            $this->view->content = $this->processTextContent($this->content['content']);
         }
 
         return $this->view->render();
