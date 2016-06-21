@@ -105,11 +105,11 @@ class MediaController extends Controller
                 Event::trigger($scope . 'BeforeUploadProcessed', $file);
 
                 if ($foundFile = $this->fileStore->getById($file->getId())) {
-                    $data = array_merge($foundFile->getDataArray(), array('url' => $foundFile->getUrl()));
+                    $data = array_merge($foundFile->toArray(), array('url' => $foundFile->getUrl()));
                     die(json_encode($data));
                 }
 
-                $file = $this->fileStore->saveByInsert($file);
+                $file = $this->fileStore->insert($file);
 
                 $fileInfo = [
                     'id' => $file->getId(),
@@ -127,7 +127,7 @@ class MediaController extends Controller
 
                 Event::trigger($scope . 'FileSaved', $file);
 
-                $data = $file->getDataArray();
+                $data = $file->toArray();
                 die(json_encode($data));
             } catch (\Exception $ex) {
                 die(json_encode(['error' => true, 'message' => $ex->getMessage()]));
@@ -150,7 +150,7 @@ class MediaController extends Controller
         if ($this->request->getMethod() == 'POST') {
 
             if ($this->request->isAjax()) {
-                $file->setMeta('focal_point', [$this->getParam('x', 0), $this->getParam('y', 0)]);
+                $file->setMetaKey('focal_point', [$this->getParam('x', 0), $this->getParam('y', 0)]);
                 $this->fileStore->save($file);
                 die('OK');
             }
@@ -174,14 +174,14 @@ class MediaController extends Controller
             }
         }
 
-        $this->view->form = $this->fileForm($file->getDataArray(), $scope)->render();
+        $this->view->form = $this->fileForm($file->toArray(), $scope)->render();
 
         $imageFiles = ['jpg', 'jpeg', 'gif', 'png'];
 
         if (in_array($file->getExtension(), $imageFiles)) {
             $this->view->image = $file->getUrl();
 
-            $focal = $file->getMeta('focal_point');
+            $focal = $file->getMetaKey('focal_point');
 
             if (is_null($focal) || !is_array($focal)) {
                 $focal = [0, 0];

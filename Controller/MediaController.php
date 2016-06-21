@@ -50,7 +50,7 @@ class MediaController extends Controller
 
         if (!empty($imageInfo['data'])) {
             $image = new Image($imageInfo['data'], $file->getId());
-            $focal = $file->getMeta('focal_point');
+            $focal = $file->getMetaKey('focal_point');
 
             if (!is_null($focal) && is_array($focal)) {
                 $image->setFocalPoint($focal[0], $focal[1]);
