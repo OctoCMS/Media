@@ -82,6 +82,7 @@ class MediaController extends Controller
             $file->setCreatedDate(new \DateTime);
             $file->setUpdatedDate(new \DateTime);
             $file->setUserId($this->currentUser->getId());
+            $file->setMeta([]);
 
             switch ($info['type']) {
                 case 'image/jpeg':
