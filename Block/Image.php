@@ -55,7 +55,12 @@ class Image extends Block
 
         if (!empty($image)) {
             $file = Store::get('File')->getById($image);
-            return new \Octo\Media\Image($file);
+
+            if (!empty($file)) {
+                $image = new \Octo\Media\Image($file);
+            }
         }
+
+        return $image;
     }
 }
