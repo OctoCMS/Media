@@ -107,7 +107,7 @@ class MediaController extends Controller
 
                 if ($foundFile = $this->fileStore->getById($file->getId())) {
                     $data = array_merge($foundFile->toArray(), array('url' => $foundFile->getUrl()));
-                    die(json_encode($data));
+                    return $this->json($data);
                 }
 
                 $file = $this->fileStore->insert($file);
@@ -123,15 +123,15 @@ class MediaController extends Controller
 
                 if (!Event::trigger('PutFile', $fileInfo)) {
                     $this->fileStore->delete($file);
-                    die(json_encode(['error' => true, 'message' => 'Upload failed']));
+                    return $this->json(['error' => true, 'message' => 'Upload failed']);
                 }
 
                 Event::trigger($scope . 'FileSaved', $file);
 
                 $data = $file->toArray();
-                die(json_encode($data));
+                return $this->json($data);
             } catch (\Exception $ex) {
-                die(json_encode(['error' => true, 'message' => $ex->getMessage()]));
+                return $this->json(['error' => true, 'message' => $ex->getMessage()]);
             }
         }
         $this->view->scope = $scope;
@@ -153,7 +153,7 @@ class MediaController extends Controller
             if ($this->request->isAjax()) {
                 $file->setMetaKey('focal_point', [$this->getParam('x', 0), $this->getParam('y', 0)]);
                 $this->fileStore->save($file);
-                die('OK');
+                return $this->raw('OK');
             }
 
             $values = array_merge($this->getParams(), array('id' => $fileId));
@@ -163,10 +163,10 @@ class MediaController extends Controller
                 try {
                     $file->setValues($this->getParams());
                     $file = $this->fileStore->save($file);
-                    $this->successMessage($file->getTitle() . ' was edited successfully.', true);
-
                     Event::trigger($scope . 'MediaEditPostSave', $this);
-                    $this->redirect('/media/manage/' . $scope);
+
+                    return $this->redirect('/media/manage/' . $scope)
+                                ->success($file->getTitle() . ' was edited successfully.');
                 } catch (\Exception $e) {
                     $this->errorMessage('There was an error editing the file. Please try again.');
                 }
@@ -268,7 +268,7 @@ class MediaController extends Controller
             ];
         }
 
-        die(json_encode($rtn));
+        return $this->json($rtn);
     }
 
     /**
@@ -281,10 +281,8 @@ class MediaController extends Controller
         @unlink($file->getPath());
         $this->fileStore->delete($file);
 
-        $this->successMessage($file->getTitle() . ' was deleted successfully.', true);
-
         Event::trigger($scope . 'DeleteFile', $this);
-        $this->redirect('/media/manage/'.$scope);
+        return $this->redirect('/media/manage/'.$scope)->success($file->getTitle() . ' was deleted successfully.');
     }
 
     /**
@@ -342,6 +340,6 @@ class MediaController extends Controller
             }
         }
 
-        die(json_encode($rtn));
+        return $this->json($rtn);
     }
 }
