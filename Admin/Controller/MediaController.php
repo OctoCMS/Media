@@ -23,7 +23,7 @@ class MediaController extends Controller
      */
     public static function registerMenus(Menu $menu)
     {
-        $media = $menu->addRoot('Media', '/media')->setIcon('picture-o');
+        $media = $menu->getRoot('Media');
         $media->addChild(new Menu\Item('Upload', '/media/add'));
 
         $media->addChild(Menu\Item::create('Load Metadata', '/media/metadata', true));

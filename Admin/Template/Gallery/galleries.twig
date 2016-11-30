@@ -1,0 +1,36 @@
+<div class="row">
+    <div class="col-xs-12" style="margin-bottom: 20px;">
+        <a class="pull-right btn btn-primary" href="{{ adminUri }}/gallery/create{{ gallery ? '/' ~ gallery.id : '' }}"><i class="fa fa-plus"></i> Add Gallery</a>
+    </div>
+</div>
+
+{% if galleries.count %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title">Galleries</h3>
+            </div>
+            <div class="box-body no-padding">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Gallery</th>
+                        <th style="width: 150px;">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for gallery in galleries %}
+                        <tr>
+                            <td><a href="{{ adminUri }}/gallery/edit/{{ gallery.id }}">{{ gallery.title }}</a></td>
+                            <td><a href="{{ adminUri }}/gallery/delete/{{ gallery.id }}" class="btn btn-default btn-delete"><i class="fa fa-trash"></i></a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

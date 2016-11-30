@@ -24,7 +24,7 @@ class Gallery extends Block
     public static function getInfo()
     {
         return [
-            'title' => 'Image Gallery',
+            'title' => 'Image Collection',
             'icon' => 'image',
             'editor' => ['\Octo\Media\Block\Gallery', 'getEditorForm']
         ];

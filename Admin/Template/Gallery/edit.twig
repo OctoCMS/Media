@@ -1,0 +1,201 @@
+{% extends "@admin/layout.twig" %}
+
+{% block content %}
+    {% include "@admin/Gallery/galleries.twig" %}
+
+
+    <div class="box box-primary">
+        <div class="box-body">
+            <form class="form" method="POST">
+
+                <div class="form-group">
+                    <label for="gallery_title">Gallery Title</label>
+                    <input type="text" class="form-control" name="title" id="gallery_title" value="{{ gallery.title }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="gallery_description">Description</label>
+                    <textarea class="form-control ckeditor small" name="description" id="gallery_description">{{ gallery.description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-primary pull-right" type="submit">Save Gallery</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="box box-default">
+        <div class="box-header">
+            <h3 class="box-title">Images</h3>
+        </div>
+
+        <div class="box-body">
+            <div class="row gallery-images">
+                {% for image in images %}
+                <div class="col-lg-2 gallery-image " id="{{ image.id }}">
+                    <img class="img-responsive" src="/media/render/{{ image.id }}/400/400/jpeg">
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="upload-container" style="margin-top: 30px; position: relative; padding: 50px 50px; background: #f0f0f0; border: 4px dashed #ccc; text-align: center">
+                        Drop images here or <button class="btn btn-primary" id="select-files">select images</button>
+
+                        <div id="progress-bar" class="progress progress-sm progress-striped active" style="position: absolute; background: #f0f0f0; margin: 0; bottom: 0; left: 0; width: 100%">
+                            <div class="progress-bar bg-color-blue" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <br><strong>Use an image already uploaded...</strong><br>
+                    <select class="octo-image-picker"></select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<style>
+    .gallery-image {
+        position: relative;
+    }
+
+    .gallery-image .btn {
+        color: darkred;
+        position: absolute;
+        top: -5px;
+        right: 5px;
+
+        display: none;
+    }
+
+    .gallery-image:hover .btn {
+        display: block;
+    }
+</style>
+
+    <script>
+        function fileSizeSI(a,b,c,d,e){
+            return (b=Math,c=b.log,d=1e3,e=c(a)/c(d)|0,a/b.pow(d,e)).toFixed(2) +' '+(e?'kMGTPEZY'[--e]+'B':'Bytes')
+        }
+
+        $(document).ready(function()
+        {
+            initImages();
+
+            var uploader = new plupload.Uploader({
+                runtimes : 'html5,html4',
+                browse_button : 'select-files',
+                drop_element : 'upload-container',
+                max_file_size : '10mb',
+                url : '/manage/media/add',
+                filters : []
+            });
+
+            uploader.bind('Init', function(up, params) {});
+            uploader.init();
+
+            uploader.bind('QueueChanged', function(up, files) {
+                $('#progress-bar').show();
+                $('#progress-bar .progress-bar').css('width', 0);
+                up.start();
+            });
+
+            uploader.bind('UploadProgress', function(up, file) {
+                $('#progress-bar .progress-bar').css('width', uploader.total.percent + '%');
+            });
+
+            uploader.bind('UploadComplete', function(up, file) {
+                $('#progress-bar').hide();
+            });
+
+            uploader.bind("FileUploaded", function(up, file, response) {
+                if (response.status == 200) {
+                    var f = JSON.parse(response.response);
+                    $.post('{{ adminUri }}/gallery/attach/{{ gallery.id }}/' + f.id);
+
+                    if ($('#' + f.id).length) {
+                        return;
+                    }
+
+                    var $image = $('<img class="img-responsive" src="/media/render/'+f.id+'/400/400/jpeg">');
+                    var $wrapper = $('<div class="col-lg-2 gallery-image"></div>');
+                    var $images = $('.gallery-images');
+
+                    $wrapper.append($image);
+                    $images.append($wrapper);
+                    initImages();
+                }
+            });
+
+            uploader.bind("Error", function(up, file, response) {
+                var error = $('<div class="alert alert-danger">Failed to upload file: ' + file.name + '</div>');
+                error.insertAfter('#upload-container');
+            });
+
+            $('.octo-image-picker').on('change', function () {
+                var id = $(this).val();
+
+                $.post('{{ adminUri }}/gallery/attach/{{ gallery.id }}/' + id);
+
+                if ($('#' + id).length) {
+                    return;
+                }
+
+                var $image = $('<img class="img-responsive" src="/media/render/'+id+'/400/400/jpeg">');
+                var $wrapper = $('<div class="col-lg-2 gallery-image"></div>');
+                var $images = $('.gallery-images');
+
+                $wrapper.append($image);
+                $images.append($wrapper);
+                initImages();
+            });
+
+        });
+
+        function initImages() {
+            $('.gallery-image').each(function () {
+
+                var $image = $(this);
+
+                if ($image.hasClass('initiated')) {
+                    return;
+                }
+
+                var $delete = $('<button class="btn btn-default"><i class="fa fa-trash"></i></button>');
+                $image.append($delete);
+
+                $delete.on('click', function () {
+                    if (confirm('Are you sure you want to remove this image?')) {
+                        $.post('{{ adminUri }}/gallery/detach/{{ gallery.id }}/' + $image.attr('id'));
+
+                        $image.fadeOut(function () {
+                            $image.remove();
+                        });
+                    }
+                });
+            });
+
+            $('.gallery-images').sortable({
+                //axis: 'y',
+                //containment: 'parent',
+                items: '.gallery-image',
+                helper: fixHelper,
+                //handle: '.handle',
+                update: function () {
+                    var order = {};
+
+                    $('.gallery-images .gallery-image').each(function (idx) {
+                        order[$(this).attr('id')] = idx;
+                    });
+
+                    $.post('{{ adminUri }}/gallery/order/{{ gallery.id }}', {order: JSON.stringify(order)});
+                }
+            });
+        }
+    </script>
+
+{% endblock %}
