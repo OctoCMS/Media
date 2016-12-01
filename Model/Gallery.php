@@ -68,4 +68,12 @@ class Gallery extends GalleryBase
             ->order('sort_order', 'ASC')
             ->get();
     }
+
+    public function getSnippet()
+    {
+        $snippet = $this->getDescription();
+        $snippet = strip_tags($snippet);
+        $snippet = strlen($snippet) > 140 ? substr($snippet, 0, 137) . '...' : $snippet;
+        return $snippet;
+    }
 }

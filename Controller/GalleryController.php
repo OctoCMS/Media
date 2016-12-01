@@ -34,6 +34,7 @@ class GalleryController extends Controller
         $template->galleries = $this->galleryStore
             ->find()
             ->where('parent_id', null, Query::IS_NULL)
+            ->order('sort_order', 'ASC')
             ->get();
 
         return $template->render();
@@ -58,6 +59,7 @@ class GalleryController extends Controller
         $template->galleries = $this->galleryStore
             ->find()
             ->where('parent_id', $gallery->getId())
+            ->order('sort_order', 'ASC')
             ->get();
 
         return $template->render();

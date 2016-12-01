@@ -50,4 +50,20 @@ class GalleryStore extends GalleryStoreBase
             $stmt->execute();
         }
     }
+
+    public function orderGalleries($order)
+    {
+        if (!is_array($order)) {
+            return;
+        }
+
+        $db = Database::getConnection('write');
+        $stmt = $db->prepare('UPDATE gallery SET sort_order = :pos WHERE id = :gallery');
+
+        foreach ($order as $galleryId => $position) {
+            $stmt->bindValue(':gallery', $galleryId);
+            $stmt->bindValue(':pos', $position);
+            $stmt->execute();
+        }
+    }
 }

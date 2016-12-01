@@ -40,6 +40,7 @@ class GalleryController extends Controller
         $this->template->galleries = $this->galleryStore
             ->find()
             ->where('parent_id', null, Query::IS_NULL)
+            ->order('sort_order', 'ASC')
             ->get();
     }
 
@@ -106,6 +107,14 @@ class GalleryController extends Controller
         $order = json_decode($this->getParam('order', '{}'), true);
 
         $this->galleryStore->order($galleryId, $order);
+        return $this->json(['error' => false]);
+    }
+
+    public function orderGalleries()
+    {
+        $order = json_decode($this->getParam('order', '{}'), true);
+
+        $this->galleryStore->orderGalleries($order);
         return $this->json(['error' => false]);
     }
 }

@@ -19,11 +19,14 @@
                         <th style="width: 150px;">Actions</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="gallery-list">
                     {% for gallery in galleries %}
-                        <tr>
+                        <tr data-id="{{ gallery.id }}">
                             <td><a href="{{ adminUri }}/gallery/edit/{{ gallery.id }}">{{ gallery.title }}</a></td>
-                            <td><a href="{{ adminUri }}/gallery/delete/{{ gallery.id }}" class="btn btn-default btn-delete"><i class="fa fa-trash"></i></a></td>
+                            <td>
+                                <a href="{{ adminUri }}/gallery/delete/{{ gallery.id }}" class="btn btn-default btn-delete"><i class="fa fa-trash"></i></a>
+                                <i class="fa fa-arrows handle" style="color: #666; float: right; margin-top: 5px; padding: 5px; display: inline-block; cursor: move;"></i>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -33,4 +36,23 @@
         </div>
     </div>
 </div>
+
+<script>
+    $('.gallery-list').sortable({
+        axis: 'y',
+        //containment: 'parent',
+        items: 'tr',
+        //helper: fixHelper,
+        handle: '.handle',
+        update: function () {
+            var order = {};
+
+            $('.gallery-list tr').each(function (idx) {
+                order[$(this).data('id')] = idx;
+            });
+
+            $.post('{{ adminUri }}/gallery/order-galleries', {order: JSON.stringify(order)});
+        }
+    });
+</script>
 {% endif %}
