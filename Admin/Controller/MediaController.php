@@ -156,11 +156,23 @@ class MediaController extends Controller
                 return $this->raw('OK');
             }
 
-            $values = array_merge($this->getParams(), array('id' => $fileId));
+            $params = $this->getParams();
+            $meta = [];
+
+            if (isset($params['meta'])) {
+                $meta = $params['meta'];
+                unset($params['meta']);
+            }
+
+            $values = array_merge($params, array('id' => $fileId));
             $form = $this->fileForm($values, $scope, 'edit');
 
             if ($form->validate()) {
                 try {
+                    foreach ($meta as $key => $value) {
+                        $file->setMetaKey($key, $value);
+                    }
+
                     $file->setValues($this->getParams());
                     $file = $this->fileStore->save($file);
                     Event::trigger($scope . 'MediaEditPostSave', $this);
@@ -215,6 +227,14 @@ class MediaController extends Controller
         $field->setRequired(true);
         $field->setLabel('File Name');
         $fieldset->addField($field);
+
+        if ($scope != 'images') {
+            $field = new Form\Element\Select('meta[thumbnail]');
+            $field->setRequired(false);
+            $field->setLabel('Thumbnail');
+            $field->setClass('octo-image-picker');
+            $fieldset->addField($field);
+        }
 
         $data = [&$form, &$values];
         Event::trigger($scope . 'FileFormFields', $data);

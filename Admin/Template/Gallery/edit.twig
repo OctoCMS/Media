@@ -34,9 +34,9 @@
         <div class="box-body">
             <div class="row gallery-images">
                 {% for image in images %}
-                <div class="col-lg-2 gallery-image " id="{{ image.id }}">
-                    <img class="img-responsive" src="/media/render/{{ image.id }}/400/400/jpeg">
-                </div>
+                    <div class="col-lg-2 gallery-image " id="{{ image.id }}">
+                        <img class="img-responsive" src="/media/render/{{ image.scope != 'images' ? image.getMetaKey('thumbnail') : image.id }}/400/400/jpeg">
+                    </div>
                 {% endfor %}
             </div>
 
@@ -90,7 +90,7 @@
                 runtimes : 'html5,html4',
                 browse_button : 'select-files',
                 drop_element : 'upload-container',
-                max_file_size : '10mb',
+                max_file_size : '250mb',
                 url : '/manage/media/add',
                 filters : []
             });

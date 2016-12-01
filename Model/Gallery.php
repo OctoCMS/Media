@@ -43,6 +43,7 @@ class Gallery extends GalleryBase
             ->find()
             ->join('gallery_image', 'image_id', 'id')
             ->where('gallery_id', $this->getId())
+            ->and('scope', 'images')
             ->order('sort_order', 'ASC')
             ->first();
 
