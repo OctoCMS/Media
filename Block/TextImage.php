@@ -29,7 +29,7 @@ class TextImage extends Text
 
         $content = TextArea::create('content', 'Content', false);
         $content->setId('block_textimage_content_' . $item['id']);
-        $content->setClass('ckeditor advanced');
+        $content->setClass('html-editor advanced');
 
         $image = \b8\Form\Element\Select::create('image', 'Image', false);
         $image->setId('block_image_image_' . $item['id']);

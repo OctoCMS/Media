@@ -4,6 +4,7 @@ namespace Octo\Media\Admin\Controller;
 use Block8\Database\Query;
 use Octo\Admin\Controller;
 use Octo\Admin\Menu;
+use Octo\AssetManager;
 use Octo\File\Store\FileStore;
 use Octo\Media\Model\Gallery;
 use Octo\Media\Store\GalleryStore;
@@ -56,6 +57,7 @@ class GalleryController extends Controller
 
     public function edit($galleryId)
     {
+        AssetManager::getInstance()->addThirdParty('js', 'Media', 'plupload/plupload.full.min.js');
         $gallery = $this->galleryStore->getById($galleryId);
 
         if ($this->request->getMethod() == 'POST') {

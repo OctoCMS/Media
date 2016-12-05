@@ -4,6 +4,7 @@ namespace Octo\Media\Admin\Controller;
 use b8\Form;
 use b8\Image;
 use b8\Http\Upload;
+use Octo\AssetManager;
 use Octo\Store;
 use Octo\Admin\Controller;
 use Octo\Admin\Form as FormElement;
@@ -65,6 +66,8 @@ class MediaController extends Controller
     {
         $this->setTitle('Upload Media and Files');
         $this->addBreadcrumb('Upload');
+
+        AssetManager::getInstance()->addThirdParty('js', 'Media', 'plupload/plupload.full.min.js');
 
         Event::trigger($scope . 'Upload', $this);
 
