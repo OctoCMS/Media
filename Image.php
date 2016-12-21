@@ -21,7 +21,7 @@ class Image
         $this->file = $file;
     }
 
-    public function tag($width = 1000, $height = 'auto', $format = 'png')
+    public function tag($width = 1000, $height = 'auto', $format = 'auto')
     {
         $this->width = $width;
         $this->height = $height;
@@ -31,7 +31,7 @@ class Image
         return $this;
     }
 
-    public function url($width = 1000, $height = 'auto', $format = 'png')
+    public function url($width = 1000, $height = 'auto', $format = 'auto')
     {
         $this->width = $width;
         $this->height = $height;
