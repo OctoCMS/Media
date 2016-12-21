@@ -6,6 +6,7 @@ use b8\Image;
 use b8\Form;
 use Octo\Controller;
 use Octo\Event;
+use Octo\Http\Response;
 use Octo\Store;
 use Octo\File\Store\FileStore;
 use Octo\File\Store\FileDownloadStore;
@@ -29,16 +30,24 @@ class MediaController extends Controller
     }
 
     /**
-     * @param $fileId
-     * @param int $width
-     * @param int $height
+     * @param string $fileId
+     * @param string $width
+     * @param string $height
+     * @param string $type
+     *
+     * @return Response
      */
-    public function render($fileId, $width = 'auto', $height = 'auto', $type = 'jpeg')
+    public function render(string $fileId, string $width = 'auto', string $height = 'auto', string $type = 'auto')
     {
         $file = $this->fileStore->getById($fileId);
 
+        if ($type === 'auto') {
+            $type = $this->autoImageType();
+        }
+
         Image::$cacheEnabled = OCTO_CACHE_ENABLED;
         Image::$baseCachePath = OCTO_CACHE_PATH;
+        Image::$forceGd = true;
 
         if ($this->getParam('nocache', 0)) {
             Image::$cacheEnabled = false;
@@ -57,19 +66,25 @@ class MediaController extends Controller
             }
 
             $output = (string)$image->render($width, $height, $type);
+
+            return $this->raw($output)->headers([
+                'Content-Type' => $image->getMime(),
+                'Content-Length' => strlen($output),
+                'Cache-Control' => 'public',
+                'Pragma' => 'cache',
+                'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + (86400*100)),
+            ]);
         }
 
-        if (empty($output)) {
-            $output = Image\GdImage::blankImage(1, 1);
-        }
+        $output = Image\GdImage::blankImage(1, 1);
 
-        header('Content-Type: image/'.$type);
-        header('Content-Length: ' . strlen($output));
-        header('Cache-Control: public');
-        header('Pragma: cache');
-        header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (86400*100)));
-
-        die($output);
+        return $this->raw($output)->headers([
+            'Content-Type' => 'image/gif',
+            'Content-Length' => strlen($output),
+            'Cache-Control' => 'private',
+            'Pragma' => 'no-cache',
+            'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time()),
+        ]);
     }
 
     public function resize($width, $height = 'auto', $type = 'jpeg')
@@ -137,7 +152,7 @@ class MediaController extends Controller
     public function ajax($scope)
     {
         $files = $this->fileStore->getAllForScope($scope);
-//        File::$sleepable = array('id', 'url', 'title');
+
         foreach ($files as &$item) {
             if (file_exists($item->getPath())) {
                 $imageData = getimagesize($item->getPath());
@@ -148,29 +163,17 @@ class MediaController extends Controller
                 $item = $item->toArray(1);
             }
         }
+
         print json_encode($files);
         exit;
     }
 
-    /**
-     * Download a file
-     *
-     * Download the file with its original filename and content type, and log the download
-     *
-     * @param $fileId File ID to download
-     */
-    public function download($fileId)
+    protected function autoImageType()
     {
-        $file = $this->fileStore->getById($fileId);
-        $download = new FileDownload();
-        $download->setFileId($file->getId());
-        $download->setDownloaded(new \DateTime);
+        if (strpos($_SERVER['HTTP_ACCEPT'], 'image/webp') !== false) {
+            return 'webp';
+        }
 
-        $fileDownloadStore = new FileDownloadStore;
-        $fileDownloadStore->save($download);
-
-        header('Content-type: ' . $file->getMimeType());
-        header('Content-Disposition: attachment; filename="' . $file->getFilename() . '"');
-        readfile($file->getPath());
+        return 'jpeg';
     }
 }
