@@ -14,17 +14,17 @@ use Octo\Store;
  */
 class Gallery extends GalleryBase
 {
-    public function setTitle(string $title)
+    public function setTitle(string $value) : Gallery
     {
-        parent::setTitle($title);
-
         $base = $this->getParentId() ? $this->getParent()->getSlug() . '/' : '';
-        $slug = strtolower($title);
+        $slug = strtolower($value);
         $slug = str_replace('\'', '', $slug);
         $slug = preg_replace('/([^a-zA-Z0-9\-])/', '-', $slug);
         $slug = str_replace('--', '-', $slug);
 
         $this->setSlug($base . $slug);
+
+        return parent::setTitle($value);
     }
 
     public function imageCount()

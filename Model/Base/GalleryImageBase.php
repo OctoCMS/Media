@@ -7,13 +7,15 @@
 namespace Octo\Media\Model\Base;
 
 use DateTime;
+use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
+use Octo\Media\Model\GalleryImage;
 
 /**
  * GalleryImage Base Model
  */
-class GalleryImageBase extends Model
+abstract class GalleryImageBase extends Model
 {
     protected function init()
     {
@@ -36,6 +38,9 @@ class GalleryImageBase extends Model
         
         // Foreign keys:
         
+        $this->getters['Gallery'] = 'getGallery';
+        $this->setters['Gallery'] = 'setGallery';
+        
         $this->getters['Image'] = 'getImage';
         $this->setters['Image'] = 'setImage';
         
@@ -47,7 +52,7 @@ class GalleryImageBase extends Model
      * @return int
      */
 
-     public function getGalleryId()
+     public function getGalleryId() : int
      {
         $rtn = $this->data['gallery_id'];
 
@@ -59,7 +64,7 @@ class GalleryImageBase extends Model
      * @return string
      */
 
-     public function getImageId()
+     public function getImageId() : string
      {
         $rtn = $this->data['image_id'];
 
@@ -71,7 +76,7 @@ class GalleryImageBase extends Model
      * @return int
      */
 
-     public function getSortOrder()
+     public function getSortOrder() : int
      {
         $rtn = $this->data['sort_order'];
 
@@ -82,61 +87,118 @@ class GalleryImageBase extends Model
     /**
      * Set the value of GalleryId / gallery_id
      * @param $value int
+     * @return GalleryImage
      */
-    public function setGalleryId(int $value)
+    public function setGalleryId(int $value) : GalleryImage
     {
-
-        $this->validateNotNull('GalleryId', $value);
-
-        if ($this->data['gallery_id'] === $value) {
-            return;
-        }
-
-        $this->data['gallery_id'] = $value;
-        $this->setModified('gallery_id');
-    }
-    
-    /**
-     * Set the value of ImageId / image_id
-     * @param $value string
-     */
-    public function setImageId(string $value)
-    {
-
 
         // As this column is a foreign key, empty values should be considered null.
         if (empty($value)) {
             $value = null;
         }
 
-        $this->validateNotNull('ImageId', $value);
 
-        if ($this->data['image_id'] === $value) {
-            return;
+        if ($this->data['gallery_id'] !== $value) {
+            $this->data['gallery_id'] = $value;
+            $this->setModified('gallery_id');
         }
 
-        $this->data['image_id'] = $value;
-        $this->setModified('image_id');
+        return $this;
+    }
+    
+    /**
+     * Set the value of ImageId / image_id
+     * @param $value string
+     * @return GalleryImage
+     */
+    public function setImageId(string $value) : GalleryImage
+    {
+
+        // As this column is a foreign key, empty values should be considered null.
+        if (empty($value)) {
+            $value = null;
+        }
+
+
+        if ($this->data['image_id'] !== $value) {
+            $this->data['image_id'] = $value;
+            $this->setModified('image_id');
+        }
+
+        return $this;
     }
     
     /**
      * Set the value of SortOrder / sort_order
      * @param $value int
+     * @return GalleryImage
      */
-    public function setSortOrder(int $value)
+    public function setSortOrder(int $value) : GalleryImage
     {
 
-        $this->validateNotNull('SortOrder', $value);
-
-        if ($this->data['sort_order'] === $value) {
-            return;
+        if ($this->data['sort_order'] !== $value) {
+            $this->data['sort_order'] = $value;
+            $this->setModified('sort_order');
         }
 
-        $this->data['sort_order'] = $value;
-        $this->setModified('sort_order');
+        return $this;
     }
     
     
+    /**
+     * Get the Gallery model for this  by Id.
+     *
+     * @uses \Octo\Media\Store\GalleryStore::getById()
+     * @uses \Octo\Media\Model\Gallery
+     * @return \Octo\Media\Model\Gallery
+     */
+    public function getGallery()
+    {
+        $key = $this->getGalleryId();
+
+        if (empty($key)) {
+           return null;
+        }
+
+        return Store::get('Gallery')->getById($key);
+    }
+
+    /**
+     * Set Gallery - Accepts an ID, an array representing a Gallery or a Gallery model.
+     * @throws \Exception
+     * @param $value mixed
+     */
+    public function setGallery($value)
+    {
+        // Is this a scalar value representing the ID of this foreign key?
+        if (is_scalar($value)) {
+            return $this->setGalleryId($value);
+        }
+
+        // Is this an instance of Gallery?
+        if (is_object($value) && $value instanceof \Octo\Media\Model\Gallery) {
+            return $this->setGalleryObject($value);
+        }
+
+        // Is this an array representing a Gallery item?
+        if (is_array($value) && !empty($value['id'])) {
+            return $this->setGalleryId($value['id']);
+        }
+
+        // None of the above? That's a problem!
+        throw new \Exception('Invalid value for Gallery.');
+    }
+
+    /**
+     * Set Gallery - Accepts a Gallery model.
+     *
+     * @param $value \Octo\Media\Model\Gallery
+     */
+    public function setGalleryObject(\Octo\Media\Model\Gallery $value)
+    {
+        return $this->setGalleryId($value->getId());
+    }
+
     /**
      * Get the File model for this  by Id.
      *
@@ -190,4 +252,5 @@ class GalleryImageBase extends Model
     {
         return $this->setImageId($value->getId());
     }
+
 }

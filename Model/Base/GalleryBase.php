@@ -7,13 +7,15 @@
 namespace Octo\Media\Model\Base;
 
 use DateTime;
+use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
+use Octo\Media\Model\Gallery;
 
 /**
  * Gallery Base Model
  */
-class GalleryBase extends Model
+abstract class GalleryBase extends Model
 {
     protected function init()
     {
@@ -63,7 +65,7 @@ class GalleryBase extends Model
      * @return int
      */
 
-     public function getId()
+     public function getId() : int
      {
         $rtn = $this->data['id'];
 
@@ -75,7 +77,7 @@ class GalleryBase extends Model
      * @return int
      */
 
-     public function getParentId()
+     public function getParentId() : ?int
      {
         $rtn = $this->data['parent_id'];
 
@@ -87,7 +89,7 @@ class GalleryBase extends Model
      * @return string
      */
 
-     public function getTitle()
+     public function getTitle() : string
      {
         $rtn = $this->data['title'];
 
@@ -99,7 +101,7 @@ class GalleryBase extends Model
      * @return string
      */
 
-     public function getDescription()
+     public function getDescription() : ?string
      {
         $rtn = $this->data['description'];
 
@@ -111,7 +113,7 @@ class GalleryBase extends Model
      * @return int
      */
 
-     public function getSortOrder()
+     public function getSortOrder() : int
      {
         $rtn = $this->data['sort_order'];
 
@@ -123,7 +125,7 @@ class GalleryBase extends Model
      * @return int
      */
 
-     public function getHidden()
+     public function getHidden() : int
      {
         $rtn = $this->data['hidden'];
 
@@ -135,7 +137,7 @@ class GalleryBase extends Model
      * @return string
      */
 
-     public function getSlug()
+     public function getSlug() : ?string
      {
         $rtn = $this->data['slug'];
 
@@ -146,27 +148,26 @@ class GalleryBase extends Model
     /**
      * Set the value of Id / id
      * @param $value int
+     * @return Gallery
      */
-    public function setId(int $value)
+    public function setId(int $value) : Gallery
     {
 
-        $this->validateNotNull('Id', $value);
-
-        if ($this->data['id'] === $value) {
-            return;
+        if ($this->data['id'] !== $value) {
+            $this->data['id'] = $value;
+            $this->setModified('id');
         }
 
-        $this->data['id'] = $value;
-        $this->setModified('id');
+        return $this;
     }
     
     /**
      * Set the value of ParentId / parent_id
      * @param $value int
+     * @return Gallery
      */
-    public function setParentId($value)
+    public function setParentId(?int $value) : Gallery
     {
-
 
         // As this column is a foreign key, empty values should be considered null.
         if (empty($value)) {
@@ -174,98 +175,92 @@ class GalleryBase extends Model
         }
 
 
-
-        if ($this->data['parent_id'] === $value) {
-            return;
+        if ($this->data['parent_id'] !== $value) {
+            $this->data['parent_id'] = $value;
+            $this->setModified('parent_id');
         }
 
-        $this->data['parent_id'] = $value;
-        $this->setModified('parent_id');
+        return $this;
     }
     
     /**
      * Set the value of Title / title
      * @param $value string
+     * @return Gallery
      */
-    public function setTitle(string $value)
+    public function setTitle(string $value) : Gallery
     {
 
-        $this->validateNotNull('Title', $value);
-
-        if ($this->data['title'] === $value) {
-            return;
+        if ($this->data['title'] !== $value) {
+            $this->data['title'] = $value;
+            $this->setModified('title');
         }
 
-        $this->data['title'] = $value;
-        $this->setModified('title');
+        return $this;
     }
     
     /**
      * Set the value of Description / description
      * @param $value string
+     * @return Gallery
      */
-    public function setDescription($value)
+    public function setDescription(?string $value) : Gallery
     {
 
-
-
-        if ($this->data['description'] === $value) {
-            return;
+        if ($this->data['description'] !== $value) {
+            $this->data['description'] = $value;
+            $this->setModified('description');
         }
 
-        $this->data['description'] = $value;
-        $this->setModified('description');
+        return $this;
     }
     
     /**
      * Set the value of SortOrder / sort_order
      * @param $value int
+     * @return Gallery
      */
-    public function setSortOrder(int $value)
+    public function setSortOrder(int $value) : Gallery
     {
 
-        $this->validateNotNull('SortOrder', $value);
-
-        if ($this->data['sort_order'] === $value) {
-            return;
+        if ($this->data['sort_order'] !== $value) {
+            $this->data['sort_order'] = $value;
+            $this->setModified('sort_order');
         }
 
-        $this->data['sort_order'] = $value;
-        $this->setModified('sort_order');
+        return $this;
     }
     
     /**
      * Set the value of Hidden / hidden
      * @param $value int
+     * @return Gallery
      */
-    public function setHidden(int $value)
+    public function setHidden(int $value) : Gallery
     {
 
-        $this->validateNotNull('Hidden', $value);
-
-        if ($this->data['hidden'] === $value) {
-            return;
+        if ($this->data['hidden'] !== $value) {
+            $this->data['hidden'] = $value;
+            $this->setModified('hidden');
         }
 
-        $this->data['hidden'] = $value;
-        $this->setModified('hidden');
+        return $this;
     }
     
     /**
      * Set the value of Slug / slug
      * @param $value string
+     * @return Gallery
      */
-    public function setSlug($value)
+    public function setSlug(?string $value) : Gallery
     {
 
-
-
-        if ($this->data['slug'] === $value) {
-            return;
+        if ($this->data['slug'] !== $value) {
+            $this->data['slug'] = $value;
+            $this->setModified('slug');
         }
 
-        $this->data['slug'] = $value;
-        $this->setModified('slug');
+        return $this;
     }
     
     
@@ -323,8 +318,14 @@ class GalleryBase extends Model
         return $this->setParentId($value->getId());
     }
 
-    public function Gallerys()
+
+    public function Gallerys() : Query
     {
         return Store::get('Gallery')->where('parent_id', $this->data['id']);
+    }
+
+    public function GalleryImages() : Query
+    {
+        return Store::get('GalleryImage')->where('gallery_id', $this->data['id']);
     }
 }
