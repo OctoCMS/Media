@@ -11,55 +11,88 @@ use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
 use Octo\Media\Model\Gallery;
+use Octo\Media\Store\GalleryStore;
 
 /**
  * Gallery Base Model
  */
 abstract class GalleryBase extends Model
 {
-    protected function init()
-    {
-        $this->table = 'gallery';
-        $this->model = 'Gallery';
+    protected $table = 'gallery';
+    protected $model = 'Gallery';
+    protected $data = [
+        'id' => null,
+        'parent_id' => null,
+        'title' => null,
+        'description' => null,
+        'sort_order' => 0,
+        'hidden' => 0,
+        'slug' => null,
+    ];
 
-        // Columns:
-        
-        $this->data['id'] = null;
-        $this->getters['id'] = 'getId';
-        $this->setters['id'] = 'setId';
-        
-        $this->data['parent_id'] = null;
-        $this->getters['parent_id'] = 'getParentId';
-        $this->setters['parent_id'] = 'setParentId';
-        
-        $this->data['title'] = null;
-        $this->getters['title'] = 'getTitle';
-        $this->setters['title'] = 'setTitle';
-        
-        $this->data['description'] = null;
-        $this->getters['description'] = 'getDescription';
-        $this->setters['description'] = 'setDescription';
-        
-        $this->data['sort_order'] = null;
-        $this->getters['sort_order'] = 'getSortOrder';
-        $this->setters['sort_order'] = 'setSortOrder';
-        
-        $this->data['hidden'] = null;
-        $this->getters['hidden'] = 'getHidden';
-        $this->setters['hidden'] = 'setHidden';
-        
-        $this->data['slug'] = null;
-        $this->getters['slug'] = 'getSlug';
-        $this->setters['slug'] = 'setSlug';
-        
-        // Foreign keys:
-        
-        $this->getters['Parent'] = 'getParent';
-        $this->setters['Parent'] = 'setParent';
-        
+    protected $getters = [
+        'id' => 'getId',
+        'parent_id' => 'getParentId',
+        'title' => 'getTitle',
+        'description' => 'getDescription',
+        'sort_order' => 'getSortOrder',
+        'hidden' => 'getHidden',
+        'slug' => 'getSlug',
+        'Parent' => 'getParent',
+    ];
+
+    protected $setters = [
+        'id' => 'setId',
+        'parent_id' => 'setParentId',
+        'title' => 'setTitle',
+        'description' => 'setDescription',
+        'sort_order' => 'setSortOrder',
+        'hidden' => 'setHidden',
+        'slug' => 'setSlug',
+        'Parent' => 'setParent',
+    ];
+
+    /**
+     * Return the database store for this model.
+     * @return GalleryStore
+     */
+    public static function Store() : GalleryStore
+    {
+        return GalleryStore::load();
     }
 
-    
+    /**
+     * Get Gallery by primary key: id
+     * @param int $id
+     * @return Gallery|null
+     */
+    public static function get(int $id) : ?Gallery
+    {
+        return self::Store()->getById($id);
+    }
+
+    /**
+     * @throws \Exception
+     * @return Gallery
+     */
+    public function save() : Gallery
+    {
+        $rtn = self::Store()->save($this);
+
+        if (empty($rtn)) {
+            throw new \Exception('Failed to save Gallery');
+        }
+
+        if (!($rtn instanceof Gallery)) {
+            throw new \Exception('Unexpected ' . get_class($rtn) . ' received from save.');
+        }
+
+        $this->data = $rtn->toArray();
+
+        return $this;
+    }
+
+
     /**
      * Get the value of Id / id
      * @return int

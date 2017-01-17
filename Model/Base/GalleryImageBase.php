@@ -11,42 +11,78 @@ use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
 use Octo\Media\Model\GalleryImage;
+use Octo\Media\Store\GalleryImageStore;
 
 /**
  * GalleryImage Base Model
  */
 abstract class GalleryImageBase extends Model
 {
-    protected function init()
-    {
-        $this->table = 'gallery_image';
-        $this->model = 'GalleryImage';
+    protected $table = 'gallery_image';
+    protected $model = 'GalleryImage';
+    protected $data = [
+        'gallery_id' => null,
+        'image_id' => null,
+        'sort_order' => 9999,
+    ];
 
-        // Columns:
-        
-        $this->data['gallery_id'] = null;
-        $this->getters['gallery_id'] = 'getGalleryId';
-        $this->setters['gallery_id'] = 'setGalleryId';
-        
-        $this->data['image_id'] = null;
-        $this->getters['image_id'] = 'getImageId';
-        $this->setters['image_id'] = 'setImageId';
-        
-        $this->data['sort_order'] = null;
-        $this->getters['sort_order'] = 'getSortOrder';
-        $this->setters['sort_order'] = 'setSortOrder';
-        
-        // Foreign keys:
-        
-        $this->getters['Gallery'] = 'getGallery';
-        $this->setters['Gallery'] = 'setGallery';
-        
-        $this->getters['Image'] = 'getImage';
-        $this->setters['Image'] = 'setImage';
-        
+    protected $getters = [
+        'gallery_id' => 'getGalleryId',
+        'image_id' => 'getImageId',
+        'sort_order' => 'getSortOrder',
+        'Gallery' => 'getGallery',
+        'Image' => 'getImage',
+    ];
+
+    protected $setters = [
+        'gallery_id' => 'setGalleryId',
+        'image_id' => 'setImageId',
+        'sort_order' => 'setSortOrder',
+        'Gallery' => 'setGallery',
+        'Image' => 'setImage',
+    ];
+
+    /**
+     * Return the database store for this model.
+     * @return GalleryImageStore
+     */
+    public static function Store() : GalleryImageStore
+    {
+        return GalleryImageStore::load();
     }
 
-    
+    /**
+     * Get GalleryImage by primary key: image_id
+     * @param string $image_id
+     * @return GalleryImage|null
+     */
+    public static function get(string $image_id) : ?GalleryImage
+    {
+        return self::Store()->getByImageId($image_id);
+    }
+
+    /**
+     * @throws \Exception
+     * @return GalleryImage
+     */
+    public function save() : GalleryImage
+    {
+        $rtn = self::Store()->save($this);
+
+        if (empty($rtn)) {
+            throw new \Exception('Failed to save GalleryImage');
+        }
+
+        if (!($rtn instanceof GalleryImage)) {
+            throw new \Exception('Unexpected ' . get_class($rtn) . ' received from save.');
+        }
+
+        $this->data = $rtn->toArray();
+
+        return $this;
+    }
+
+
     /**
      * Get the value of GalleryId / gallery_id
      * @return int

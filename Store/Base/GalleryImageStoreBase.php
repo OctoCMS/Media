@@ -7,18 +7,41 @@
 
 namespace Octo\Media\Store\Base;
 
+use Block8\Database\Connection;
 use Octo\Store;
 use Octo\Media\Model\GalleryImage;
 use Octo\Media\Model\GalleryImageCollection;
+use Octo\Media\Store\GalleryImageStore;
 
 /**
  * GalleryImage Base Store
  */
 class GalleryImageStoreBase extends Store
 {
+    /** @var GalleryImageStore $instance */
+    protected static $instance = null;
+
+    /** @var string */
     protected $table = 'gallery_image';
+
+    /** @var string */
     protected $model = 'Octo\Media\Model\GalleryImage';
+
+    /** @var string */
     protected $key = 'image_id';
+
+    /**
+     * Return the database store for this model.
+     * @return GalleryImageStore
+     */
+    public static function load() : GalleryImageStore
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new GalleryImageStore(Connection::get());
+        }
+
+        return self::$instance;
+    }
 
     /**
     * @param $value
