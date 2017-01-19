@@ -62,9 +62,7 @@
                 q: JSON.stringify(blockContent.images)
             },
             type:'POST',
-            success:function(data) {
-                var imagesMeta = JSON.parse(data);
-
+            success:function(imagesMeta) {
                 $.each(imagesMeta.results, function(i, item) {
                     appendImage(imagesMeta.results[i].id, imagesMeta.results[i].text);
                 });
@@ -84,7 +82,7 @@
                     update: function () {
                         galleryImagePicker.trigger('autosave');
                     }
-                })
+                });
 
                 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
                     imageList.sortable('refreshPositions');
