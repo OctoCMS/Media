@@ -10,8 +10,11 @@ use DateTime;
 use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
-use Octo\Media\Model\GalleryImage;
+
 use Octo\Media\Store\GalleryImageStore;
+use Octo\Media\Model\GalleryImage;
+use Octo\Media\Model\Gallery;
+use Octo\File\Model\File;
 
 /**
  * GalleryImage Base Model
@@ -87,7 +90,6 @@ abstract class GalleryImageBase extends Model
      * Get the value of GalleryId / gallery_id
      * @return int
      */
-
      public function getGalleryId() : int
      {
         $rtn = $this->data['gallery_id'];
@@ -99,7 +101,6 @@ abstract class GalleryImageBase extends Model
      * Get the value of ImageId / image_id
      * @return string
      */
-
      public function getImageId() : string
      {
         $rtn = $this->data['image_id'];
@@ -111,7 +112,6 @@ abstract class GalleryImageBase extends Model
      * Get the value of SortOrder / sort_order
      * @return int
      */
-
      public function getSortOrder() : int
      {
         $rtn = $this->data['sort_order'];
@@ -180,15 +180,15 @@ abstract class GalleryImageBase extends Model
         return $this;
     }
     
-    
+
     /**
      * Get the Gallery model for this  by Id.
      *
      * @uses \Octo\Media\Store\GalleryStore::getById()
-     * @uses \Octo\Media\Model\Gallery
-     * @return \Octo\Media\Model\Gallery
+     * @uses Gallery
+     * @return Gallery|null
      */
-    public function getGallery()
+    public function getGallery() : ?Gallery
     {
         $key = $this->getGalleryId();
 
@@ -196,15 +196,16 @@ abstract class GalleryImageBase extends Model
            return null;
         }
 
-        return Store::get('Gallery')->getById($key);
+        return Gallery::Store()->getById($key);
     }
 
     /**
      * Set Gallery - Accepts an ID, an array representing a Gallery or a Gallery model.
      * @throws \Exception
      * @param $value mixed
+     * @return GalleryImage
      */
-    public function setGallery($value)
+    public function setGallery($value) : GalleryImage
     {
         // Is this a scalar value representing the ID of this foreign key?
         if (is_scalar($value)) {
@@ -212,7 +213,7 @@ abstract class GalleryImageBase extends Model
         }
 
         // Is this an instance of Gallery?
-        if (is_object($value) && $value instanceof \Octo\Media\Model\Gallery) {
+        if (is_object($value) && $value instanceof Gallery) {
             return $this->setGalleryObject($value);
         }
 
@@ -228,9 +229,10 @@ abstract class GalleryImageBase extends Model
     /**
      * Set Gallery - Accepts a Gallery model.
      *
-     * @param $value \Octo\Media\Model\Gallery
+     * @param $value Gallery
+     * @return GalleryImage
      */
-    public function setGalleryObject(\Octo\Media\Model\Gallery $value)
+    public function setGalleryObject(Gallery $value) : GalleryImage
     {
         return $this->setGalleryId($value->getId());
     }
@@ -239,10 +241,10 @@ abstract class GalleryImageBase extends Model
      * Get the File model for this  by Id.
      *
      * @uses \Octo\File\Store\FileStore::getById()
-     * @uses \Octo\File\Model\File
-     * @return \Octo\File\Model\File
+     * @uses File
+     * @return File|null
      */
-    public function getImage()
+    public function getImage() : ?File
     {
         $key = $this->getImageId();
 
@@ -250,15 +252,16 @@ abstract class GalleryImageBase extends Model
            return null;
         }
 
-        return Store::get('File')->getById($key);
+        return File::Store()->getById($key);
     }
 
     /**
      * Set Image - Accepts an ID, an array representing a File or a File model.
      * @throws \Exception
      * @param $value mixed
+     * @return GalleryImage
      */
-    public function setImage($value)
+    public function setImage($value) : GalleryImage
     {
         // Is this a scalar value representing the ID of this foreign key?
         if (is_scalar($value)) {
@@ -266,7 +269,7 @@ abstract class GalleryImageBase extends Model
         }
 
         // Is this an instance of Image?
-        if (is_object($value) && $value instanceof \Octo\File\Model\File) {
+        if (is_object($value) && $value instanceof File) {
             return $this->setImageObject($value);
         }
 
@@ -282,11 +285,11 @@ abstract class GalleryImageBase extends Model
     /**
      * Set Image - Accepts a File model.
      *
-     * @param $value \Octo\File\Model\File
+     * @param $value File
+     * @return GalleryImage
      */
-    public function setImageObject(\Octo\File\Model\File $value)
+    public function setImageObject(File $value) : GalleryImage
     {
         return $this->setImageId($value->getId());
     }
-
 }

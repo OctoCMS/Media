@@ -10,8 +10,9 @@ use DateTime;
 use Block8\Database\Query;
 use Octo\Model;
 use Octo\Store;
-use Octo\Media\Model\Gallery;
+
 use Octo\Media\Store\GalleryStore;
+use Octo\Media\Model\Gallery;
 
 /**
  * Gallery Base Model
@@ -97,7 +98,6 @@ abstract class GalleryBase extends Model
      * Get the value of Id / id
      * @return int
      */
-
      public function getId() : int
      {
         $rtn = $this->data['id'];
@@ -109,7 +109,6 @@ abstract class GalleryBase extends Model
      * Get the value of ParentId / parent_id
      * @return int
      */
-
      public function getParentId() : ?int
      {
         $rtn = $this->data['parent_id'];
@@ -121,7 +120,6 @@ abstract class GalleryBase extends Model
      * Get the value of Title / title
      * @return string
      */
-
      public function getTitle() : string
      {
         $rtn = $this->data['title'];
@@ -133,7 +131,6 @@ abstract class GalleryBase extends Model
      * Get the value of Description / description
      * @return string
      */
-
      public function getDescription() : ?string
      {
         $rtn = $this->data['description'];
@@ -145,7 +142,6 @@ abstract class GalleryBase extends Model
      * Get the value of SortOrder / sort_order
      * @return int
      */
-
      public function getSortOrder() : int
      {
         $rtn = $this->data['sort_order'];
@@ -157,7 +153,6 @@ abstract class GalleryBase extends Model
      * Get the value of Hidden / hidden
      * @return int
      */
-
      public function getHidden() : int
      {
         $rtn = $this->data['hidden'];
@@ -169,7 +164,6 @@ abstract class GalleryBase extends Model
      * Get the value of Slug / slug
      * @return string
      */
-
      public function getSlug() : ?string
      {
         $rtn = $this->data['slug'];
@@ -296,15 +290,15 @@ abstract class GalleryBase extends Model
         return $this;
     }
     
-    
+
     /**
      * Get the Gallery model for this  by Id.
      *
      * @uses \Octo\Media\Store\GalleryStore::getById()
-     * @uses \Octo\Media\Model\Gallery
-     * @return \Octo\Media\Model\Gallery
+     * @uses Gallery
+     * @return Gallery|null
      */
-    public function getParent()
+    public function getParent() : ?Gallery
     {
         $key = $this->getParentId();
 
@@ -312,15 +306,16 @@ abstract class GalleryBase extends Model
            return null;
         }
 
-        return Store::get('Gallery')->getById($key);
+        return Gallery::Store()->getById($key);
     }
 
     /**
      * Set Parent - Accepts an ID, an array representing a Gallery or a Gallery model.
      * @throws \Exception
      * @param $value mixed
+     * @return Gallery
      */
-    public function setParent($value)
+    public function setParent($value) : Gallery
     {
         // Is this a scalar value representing the ID of this foreign key?
         if (is_scalar($value)) {
@@ -328,7 +323,7 @@ abstract class GalleryBase extends Model
         }
 
         // Is this an instance of Parent?
-        if (is_object($value) && $value instanceof \Octo\Media\Model\Gallery) {
+        if (is_object($value) && $value instanceof Gallery) {
             return $this->setParentObject($value);
         }
 
@@ -344,21 +339,11 @@ abstract class GalleryBase extends Model
     /**
      * Set Parent - Accepts a Gallery model.
      *
-     * @param $value \Octo\Media\Model\Gallery
+     * @param $value Gallery
+     * @return Gallery
      */
-    public function setParentObject(\Octo\Media\Model\Gallery $value)
+    public function setParentObject(Gallery $value) : Gallery
     {
         return $this->setParentId($value->getId());
-    }
-
-
-    public function Gallerys() : Query
-    {
-        return Store::get('Gallery')->where('parent_id', $this->data['id']);
-    }
-
-    public function GalleryImages() : Query
-    {
-        return Store::get('GalleryImage')->where('gallery_id', $this->data['id']);
     }
 }
